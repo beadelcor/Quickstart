@@ -3,13 +3,144 @@ title: "Graphics with ggplot2"
 author: "Bea"
 date: "11/21/2017"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 # Learning ggplot2
 
+Load Tidyverse
+```{r tidyverse}
+library(tidyverse) ## do this every time you restart R and need it 
+```
+
 We're learning ggplot2 It's going to be amazing. 
 
-```{r}
+```{r data}
+
+ohi_data <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/OHI_global_data.csv")
 
 ```
+We start!!
+
+```{r start ggplot} 
+ggplot(ohi_data, aes(x=georegion_one, y=OHI_score)) + 
+  geom_point()
+
+ggplot(ohi_data, aes(x=georegion_one, y=OHI_score)) + 
+  geom_jitter(width=0.2)
+
+ggplot(ohi_data, aes(x=georegion_one, y=OHI_score)) + 
+  geom_count()
+```
+
+Boxplot
+```{r boxplot}
+ggplot(ohi_data, aes(x=georegion_one)) + 
+  geom_bar()
+
+```
+
+Histogram
+```{r histogram}
+ggplot(ohi_data, aes(x=HDI)) + 
+  geom_histogram()
+
+```
+
+Multiple geoms exploration
+
+```{r multiple geoms}
+
+ohi_summary <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/OHI_scores_georegion_summary.csv")
+
+ggplot(ohi_summary, aes(x=georegions, y=OHI_score_average)) +
+  geom_bar(stat = "identity") +
+  geom_jitter(data= ohi_data, aes(x=georegion_one, y= OHI_score))
+
+```
+
+Are these two approaches the same?
+
+```{r two same plots}
+
+ggplot(data = ohi_data, aes(y=OHI_score, x = HDI, color=georegion_one)) +
+  geom_point()
+  
+ggplot(data = ohi_data) +
+  geom_point(aes(y = OHI_score, x = HDI, color=georegion_one))
+
+```
+These two approaches result in the same plot here, but there could be downstream effects as more layers are added.
+
+The arguments within aes() link variables in the dataframe to some aspect of plot appearance. As we have discussed, x and y describe the axes, but other arguments can be added to describe a z variable (e.g. size or color or shape of points). Here are some examples of aes arguments:
+
+color - color of lines/points
+fill - color within polygons
+label - name
+linetype - type of line
+shape - style of point
+alpha - transparency (0-1)
+size - size of shape
+
+```{r features test}
+
+ggplot(data = ohi_data, aes(x = OHI_score, y = HDI, size = coastal_pop)) + 
+  geom_point()
+
+```
+In that code we add a third variable by modifiying the size of the points in the data by coastal_pop variable
+
+```{r features test2}
+
+ggplot(data = ohi_data, aes(x = OHI_score, y = HDI, size = coastal_pop, color =georegion_one)) + geom_point()
+
+```
+Make our plots way prettier. For that we use themes.
+
+```{r themes}
+
+source('https://raw.githubusercontent.com/OHI-Science/ohiprep/master/src/R/scatterTheme.txt')
+
+ggplot(ohi_data, aes(x=OHI_score, y= HDI)) +
+  geom_point() +
+  scatterTheme
+
+ggplot(ohi_data, aes(x=OHI_score, y= HDI, color=georegion_one)) +
+  geom_point() +
+  labs(y= "OHI score, 2017", x="Human development index", title= "Human development is good for oceans!", color = "Georegions")
+
+```
+Color stuff!!!!! Using RColorBrewer to personalize the color palette
+
+```{r brewer}
+library("RColorBrewer")
+library("colorspace")
+
+display.brewer.all()
+my_palette <- brewer.pal(n=9, "YlOrRd")
+
+```
+There are different functions to color the plots depending on the type of variable you have (discrete or continuous). 
+
+```{r variables}
+
+ggplot(ohi_data, aes(x=OHI_score, y=OHI_trend, color=HDI)) +
+  geom_point( size = 3) +
+  scale_color_gradientn(colors=my_palette)
+
+#Assign the color using a vector with discrete colors
+
+ggplot(ohi_data, aes(x=OHI_score, y=OHI_trend, color=HDI)) +
+  geom_point( size = 3) +
+  scale_color_gradientn(colors=c("blue", "red"))
+
+my_palette<-brewer.pal(n=12, "Set3")
+ggplot(ohi_data, aes(x=OHI_score, y=OHI_trend, color=georegion_one)) +
+  geom_point( size = 3) +
+  scale_color_manual(values = my_palette)
+
+```
+
+
 
