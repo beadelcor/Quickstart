@@ -1,0 +1,46 @@
+---
+title: "Tidy Coral"
+author: "Bea"
+date: "19/06/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, warning=FALSE, message=FALSE, }
+library(tidyverse) #install.packages("tidyverse")
+library(janitor) #install.packages("janitor")
+library(skimr) #install.packages("skimr")
+library(stringr)
+
+## data filepaths/urls ----
+
+## benthic data
+benthic_url <- 'https://www.nodc.noaa.gov/archive/arc0054/0104255/1.1/data/0-data/cd08/100308OaAla03m.CSV'
+
+## buoy data
+buoy_url <- 'http://www.ndbc.noaa.gov/view_text_file.php?filename=mokh1h2010.txt.gz&dir=data/historical/stdmet/'
+```
+
+```{r benthic raw}
+benthic_raw <- read_csv(benthic_url)
+```
+
+# Wrangle
+
+```{r wrangle}
+benthic <- benthic_raw %>% 
+  janitor::clean_names() #beautiful names
+
+names(benthic)
+
+#Select our columns
+
+benthic <- benthic %>%
+  select(id_name, point, x, y, id_date) %>% 
+  mutate(date = stringr::str_remove_all(id_date, "#"))
+
+benthic
+
+```
+
