@@ -1,0 +1,41 @@
+---
+title: "Gapminder-dlpyr"
+author: "Bea"
+date: "19/06/2019"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+##TIDYING DATA WITH dplyr
+
+Loading tidyverse
+```{r}
+library(tidyverse)
+```
+
+Load data
+```{r data}
+gapminder <- read_csv("https://raw.githubusercontent.com/OHI-Science/data-science-training/master/data/gapminder.csv")
+
+head(gapminder)
+tail(gapminder)
+str(gapminder) #structure of the data, best if it is a data.frame
+names(gapminder)
+ncol(gapminder)
+nrow(gapminder)
+```
+
+Start using dplyr functions
+```{r functions}
+filter(gapminder, lifeExp < 35)
+filter(gapminder, country == "Mexico", year == 2002)
+
+```
+
+```{r}
+life_exp <- filter(gapminder, country == "Brazil", year > 1986)
+#life_exp <- filter(gapminder, country == "Brazil", year > 1986 | year < 2008)
+mean(life_exp$lifeExp)
+```
+
