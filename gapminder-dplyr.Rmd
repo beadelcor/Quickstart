@@ -33,9 +33,97 @@ filter(gapminder, country == "Mexico", year == 2002)
 
 ```
 
-```{r}
+Filter function again
+```{r filter}
 life_exp <- filter(gapminder, country == "Brazil", year > 1986)
 #life_exp <- filter(gapminder, country == "Brazil", year > 1986 | year < 2008)
 mean(life_exp$lifeExp)
+```
+
+Select function
+```{r select}
+select(gapminder, year, country, lifeExp)
+#select(gapminder, -continent, -gdpPercap) #The same but using -
+```
+
+Using filter and select together
+```{r mixed}
+gap_cambodia <- filter(gapminder, country == "Cambodia")
+gap_cambodia2 <- select(gap_cambodia, -continent, -lifeExp)
+```
+
+Using the pipe operator to make things easier: This is going to save my life
+
+```{r way1}
+gapminder %>% head()
+gap_cambodia <- filter(gapminder, country == "Cambodia") %>% 
+select(-continent, -lifeExp)
+
+```
+```{r way2}
+gap_cambodia <- gapminder %>% filter(country == "Cambodia") %>% 
+select(-continent, -lifeExp) 
+```
+
+Learn `mutate()` which adds a new column
+
+```{r}
+gap2 <- gapminder %>% 
+  mutate(gdp = pop  * gdpPercap)
+```
+
+Exercise
+```{r asian_pop}
+gapminder %>% filter(continent == "Asia", year == 2007) %>%
+  mutate(pop_thousands = pop/1000) %>% 
+  select(country, year, pop_thousands)
+ 
+```
+
+Using the `group_by()` funtion
+```{r}
+gapminder %>% 
+  filter(year == 2002) %>% 
+  group_by(continent) %>% 
+  mutate(cont_pop = sum(pop))
+
+```
+
+Using summarize to reduce the number of data
+```{r}
+gapminder %>% 
+  filter(year == 2002) %>% 
+  group_by(continent) %>% 
+  summarize(cont_pop = sum(pop))
+
+```
+
+Ungroup to undo the grouping, and we always need to ungroup at the end, because R still thinks that your data frame should be grouped
+```{r}
+gapminder %>% 
+  group_by(continent, year) %>% 
+  summarize(cont_pop = sum(pop)) %>% 
+  ungroup()
+```
+
+Using 'arrange()` to arrange the columns in the data frame. If a "-" is used, it means to arranged thw other way
+
+```{r}
+gapminder %>% 
+  group_by(continent, year) %>% 
+  summarize(cont_pop = sum(pop)) %>% 
+  arrange(-year)
+```
+
+New exercise for arrange
+
+```{r}
+
+gapminder %>%
+  mutate(gdp = pop*gdpPercap) %>% 
+  group_by(continent) %>% 
+  mutate(max_gdp = max(gdp)) %>% #calculate the maximum gdp using the max() function
+  filter(gdp == max_gdp) #we only take the maximum for each country
+
 ```
 
